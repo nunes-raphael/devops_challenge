@@ -1,37 +1,43 @@
-version: '3'
-
+version: "3.9"
 services:
   db:
     image: postgres:alpine
+    hostname: postgres-db
+    container_name: postgres-db
     restart: always
-    volumes:
-      - db:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: 'la'
-      POSTGRES_DB: 'test'
-      POSTGRES_USER: 'test'
-
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    ports:
+      - 5432:5432
   api:
-    build: ./api
-    restart: always
-    ports:
-      - 3000:3000
+    hostname: web_api
+    container_name: web_api
+    build:
+      context: ./api
+      dockerfile: ./Dockerfile
+    hostname: ipi-devops
+    container_name: api-devops
     environment:
-      DB: 'postgres://test:la@db:5432/test'
-      PORT: 3000
-    links:
-      - db
-
-  web:
-    build: ./web
-    restart: always
+      PORT: 8081
+      DB: "postgres://test:test@localhost:5432/test"
+      DB_HOST: db
+      DB_USER: test
+      DB_DATABASE: test
+      DB_PASSWORD: test
+      DB_PORT: 5432
     ports:
-      - 8080:8080
+      - 8081:8081
+  web:
+    hostname: web_frontend
+    container_name: web_frontend
+    build:
+      context: ./web
+      dockerfile: ./Dockerfile
     environment:
       PORT: 8080
-      API_HOST: 'http://api:3000'
-    links:
-      - api
-
-volumes:
-  db:
+      API_HOST: http://api:8081
+    build: ./web
+    ports:
+      - 8080:8080
