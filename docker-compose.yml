@@ -1,4 +1,9 @@
 version: "3.9"
+
+networks:
+  frontend:
+  backend:
+
 services:
   db:
     image: postgres:alpine
@@ -9,8 +14,9 @@ services:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
       POSTGRES_DB: test
-    ports:
-      - 5432:5432
+    networks:
+      - backend
+
   api:
     hostname: web_api
     container_name: web_api
@@ -29,6 +35,9 @@ services:
       DB_PORT: 5432
     ports:
       - 8081:8081
+    networks:
+      - backend
+      - frontend
   web:
     hostname: web_frontend
     container_name: web_frontend
@@ -41,3 +50,5 @@ services:
     build: ./web
     ports:
       - 8080:8080
+    networks:
+      - frontend
